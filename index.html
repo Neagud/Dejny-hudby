@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trenér dějin hudby 🎵</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e0d;
+  --bg2:#1a1917;
+  --bg3:#252320;
+  --card:#1e1c1a;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --cream:#f0ead8;
+  --muted:#8a8070;
+  --red:#c0392b;
+  --green:#2e7d4f;
+  --blue:#2563a8;
+  --border:rgba(201,168,76,0.2);
+  --border2:rgba(201,168,76,0.4);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--cream);
+  font-family:'DM Sans',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.6;
+}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(15,14,13,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:60px;
+}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:18px;
+  color:var(--gold2);
+  letter-spacing:0.02em;
+}
+.logo span{color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;margin-left:8px}
+.header-stats{display:flex;gap:16px;align-items:center}
+.hstat{font-size:13px;color:var(--muted)}
+.hstat b{color:var(--cream)}
+.hstat.streak b{color:var(--gold)}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  text-align:center;
+  padding:5rem 2rem 3rem;
+  overflow:hidden;
+}
+.hero::after{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:300px;
+  background:radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:700;
+  color:var(--cream);
+  line-height:1.15;
+  margin-bottom:1rem;
+}
+.hero h1 em{
+  font-style:italic;
+  color:var(--gold2);
+}
+.hero p{
+  font-size:16px;
+  color:var(--muted);
+  max-width:480px;
+  margin:0 auto 2rem;
+}
+.hero-bar{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:10px 22px;
+  border-radius:6px;
+  font-size:14px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;
+  transition:all 0.2s;
+  border:1px solid var(--border2);
+  font-weight:500;
+  letter-spacing:0.01em;
+}
+.btn-primary{
+  background:var(--gold);
+  color:#0f0e0d;
+  border-color:var(--gold);
+}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent;
+  color:var(--cream);
+}
+.btn-ghost:hover{background:var(--bg3)}
+.btn-next{
+  background:var(--gold);
+  color:#0f0e0d;
+  border:none;
+  padding:11px 28px;
+  font-size:15px;
+  font-weight:500;
+  margin-top:1.5rem;
+  width:100%;
+  border-radius:8px;
+}
+.btn-next:hover{background:var(--gold2);transform:translateY(-1px)}
+
+/* ── PROGRESS ── */
+.progress-wrap{padding:0 2rem 1.5rem;max-width:860px;margin:0 auto}
+.progress-track{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+
+/* ── MODE TABS ── */
+.tabs{
+  display:flex;
+  gap:0;
+  max-width:860px;
+  margin:0 auto 1.5rem;
+  padding:0 2rem;
+}
+.tab{
+  flex:1;
+  padding:10px;
+  text-align:center;
+  font-size:14px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;
+  border:1px solid var(--border);
+  color:var(--muted);
+  background:var(--bg2);
+  transition:all 0.2s;
+}
+.tab:first-child{border-radius:8px 0 0 8px}
+.tab:last-child{border-radius:0 8px 8px 0}
+.tab.active{background:var(--gold);color:#0f0e0d;border-color:var(--gold);font-weight:500}
+.tab:not(.active):hover{background:var(--bg3);color:var(--cream)}
+
+/* ── CATEGORY FILTERS ── */
+.filters{
+  display:flex;gap:8px;flex-wrap:wrap;
+  max-width:860px;margin:0 auto 1.5rem;
+  padding:0 2rem;
+}
+.chip{
+  padding:5px 13px;
+  border-radius:20px;
+  font-size:12px;
+  border:1px solid var(--border);
+  color:var(--muted);
+  background:transparent;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all 0.15s;
+}
+.chip:hover{border-color:var(--border2);color:var(--cream)}
+.chip.on{background:var(--bg3);border-color:var(--gold);color:var(--gold)}
+
+/* ── MAIN AREA ── */
+main{max-width:860px;margin:0 auto;padding:0 2rem 4rem;position:relative;z-index:1}
+
+/* ── QUESTION CARD ── */
+.q-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:2rem;
+  margin-bottom:1rem;
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.cat-badge{
+  display:inline-block;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+  border:1px solid;
+}
+.q-num{font-size:12px;color:var(--muted);margin-bottom:8px}
+.q-text{
+  font-size:19px;
+  font-weight:400;
+  color:var(--cream);
+  line-height:1.5;
+  margin-bottom:1.5rem;
+  font-family:'Playfair Display',serif;
+}
+
+/* ── OPTIONS ── */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{
+  padding:13px 16px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:15px;
+  text-align:left;
+  cursor:pointer;
+  color:var(--cream);
+  background:var(--bg2);
+  font-family:'DM Sans',sans-serif;
+  transition:all 0.15s;
+  line-height:1.4;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.opt .letter{
+  min-width:22px;height:22px;border-radius:50%;
+  background:var(--bg3);
+  color:var(--muted);
+  font-size:12px;font-weight:500;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+  transition:all 0.15s;
+}
+.opt:hover:not([disabled]){border-color:var(--gold);background:var(--bg3)}
+.opt:hover:not([disabled]) .letter{background:var(--gold);color:#0f0e0d}
+.opt[disabled]{cursor:default}
+.opt.correct{background:rgba(46,125,79,0.15);border-color:#2e7d4f;color:#6fcf97}
+.opt.correct .letter{background:#2e7d4f;color:#fff}
+.opt.wrong{background:rgba(192,57,43,0.12);border-color:#c0392b;color:#e57373}
+.opt.wrong .letter{background:#c0392b;color:#fff}
+.opt.reveal{background:rgba(37,99,168,0.12);border-color:#2563a8;color:#90caf9}
+.opt.reveal .letter{background:#2563a8;color:#fff}
+
+/* ── FEEDBACK ── */
+.feedback{
+  margin-top:1.25rem;
+  padding:1.25rem;
+  border-radius:10px;
+  font-size:14px;
+  line-height:1.6;
+  animation:fadeIn 0.25s ease;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.feedback.ok{background:rgba(46,125,79,0.1);border:1px solid rgba(46,125,79,0.4);color:#a8d8b0}
+.feedback.nok{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.35);color:#e8a8a0}
+.fb-correct{font-weight:500;margin-bottom:8px}
+.mnemonic{
+  margin-top:12px;
+  padding:12px 14px;
+  background:rgba(201,168,76,0.07);
+  border-left:3px solid var(--gold);
+  border-radius:0 8px 8px 0;
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.6;
+}
+.mnemonic strong{color:var(--gold2)}
+
+/* ── FLASH CARD ── */
+.flash-q{
+  font-size:18px;
+  color:var(--cream);
+  margin-bottom:1.5rem;
+  font-family:'Playfair Display',serif;
+  line-height:1.5;
+}
+.flash-ans{
+  display:none;
+  padding:1rem 1.25rem;
+  background:var(--bg3);
+  border-radius:10px;
+  border:1px solid var(--border2);
+  margin-bottom:1rem;
+  animation:fadeIn 0.25s ease;
+}
+.flash-ans-text{font-size:16px;font-weight:500;color:var(--gold2);margin-bottom:10px}
+.flash-btns{display:flex;gap:10px;margin-top:1rem}
+.flash-btn{
+  flex:1;padding:11px;
+  border-radius:8px;font-size:14px;font-weight:500;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all 0.15s;border:1px solid;
+}
+.flash-btn.good{background:rgba(46,125,79,0.15);border-color:#2e7d4f;color:#6fcf97}
+.flash-btn.good:hover{background:rgba(46,125,79,0.25)}
+.flash-btn.bad{background:rgba(192,57,43,0.12);border-color:#c0392b;color:#e57373}
+.flash-btn.bad:hover{background:rgba(192,57,43,0.22)}
+.show-answer-btn{
+  padding:10px 20px;
+  border:1px solid var(--border2);
+  border-radius:8px;
+  color:var(--gold);
+  background:transparent;
+  font-size:14px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all 0.15s;
+}
+.show-answer-btn:hover{background:var(--bg3)}
+
+/* ── SCORE SCREEN ── */
+.score-screen{text-align:center;padding:3rem 2rem}
+.score-emoji{font-size:56px;margin-bottom:1rem}
+.score-pct{
+  font-family:'Playfair Display',serif;
+  font-size:72px;font-weight:700;
+  color:var(--gold2);line-height:1;
+  margin-bottom:0.5rem;
+}
+.score-msg{font-size:17px;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+.score-stats{
+  display:flex;gap:16px;justify-content:center;
+  margin-bottom:2rem;flex-wrap:wrap;
+}
+.score-stat{
+  padding:12px 20px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:14px;color:var(--muted);
+}
+.score-stat b{display:block;font-size:24px;color:var(--cream);margin-bottom:2px}
+
+/* ── DECORATIVE NOTES ── */
+.deco{
+  position:fixed;
+  font-size:80px;
+  opacity:0.025;
+  pointer-events:none;
+  z-index:0;
+  font-family:'Playfair Display',serif;
+  color:var(--gold);
+  user-select:none;
+}
+.deco.d1{top:15%;left:2%}
+.deco.d2{top:60%;right:2%}
+.deco.d3{bottom:10%;left:8%}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  header{padding:0 1rem}
+  .hero{padding:3rem 1rem 2rem}
+  main,.progress-wrap,.tabs,.filters{padding-left:1rem;padding-right:1rem}
+  .q-card{padding:1.25rem}
+  .q-text{font-size:16px}
+  .opt{font-size:14px;padding:11px 13px}
+}
+</style>
+</head>
+<body>
+
+<div class="deco d1">♩</div>
+<div class="deco d2">♪</div>
+<div class="deco d3">♫</div>
+
+<header>
+  <div class="logo">Dějiny hudby<span>maturitní trenér</span></div>
+  <div class="header-stats">
+    <div class="hstat">✅ <b id="h-ok">0</b></div>
+    <div class="hstat">❌ <b id="h-bad">0</b></div>
+    <div class="hstat streak">🔥 <b id="h-streak">0</b></div>
+  </div>
+</header>
+
+<div class="hero" id="hero">
+  <h1>Nauč se dějiny hudby<br><em>hravě a rychle</em></h1>
+  <p>Přes 50 otázek, mnemotechniky na míru, kvíz i flashkarty. Žádné nudné memorování.</p>
+  <div class="hero-bar">
+    <button class="btn btn-primary" onclick="document.getElementById('hero').style.display='none';document.getElementById('game').style.display='block';startSession()">🎯 Začít trénink</button>
+  </div>
+</div>
+
+<div id="game" style="display:none">
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="prog-label">Otázka 1</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('quiz')">🎯 Kvíz</button>
+    <button class="tab" onclick="setMode('flash')">🃏 Flashkarty</button>
+  </div>
+
+  <div class="filters" id="filter-row"></div>
+
+  <main id="quiz-area"></main>
+</div>
+
+<script>
+const CAT_COLORS={
+  "Pravěk & Antika":["rgba(46,125,79,0.15)","#6fcf97","rgba(46,125,79,0.5)"],
+  "Středověk":["rgba(37,99,168,0.15)","#90caf9","rgba(37,99,168,0.5)"],
+  "Renesance":["rgba(201,168,76,0.12)","#e8c97a","rgba(201,168,76,0.5)"],
+  "Baroko":["rgba(156,77,174,0.15)","#ce93d8","rgba(156,77,174,0.5)"],
+  "Klasicismus":["rgba(0,131,143,0.15)","#80deea","rgba(0,131,143,0.5)"],
+  "Romantismus":["rgba(192,57,43,0.12)","#ef9a9a","rgba(192,57,43,0.5)"],
+  "Opera 19. st.":["rgba(230,81,0,0.12)","#ffcc80","rgba(230,81,0,0.5)"],
+  "Čechy & Smetana":["rgba(21,101,192,0.15)","#90caf9","rgba(21,101,192,0.5)"],
+  "Čechy & Dvořák":["rgba(21,101,192,0.15)","#90caf9","rgba(21,101,192,0.5)"],
+  "Národní školy":["rgba(46,125,79,0.12)","#a5d6a7","rgba(46,125,79,0.5)"],
+  "Přelom 19./20. st.":["rgba(96,125,139,0.15)","#b0bec5","rgba(96,125,139,0.5)"],
+  "Impresionismus":["rgba(0,105,92,0.15)","#80cbc4","rgba(0,105,92,0.5)"],
+  "2. vídeňská škola":["rgba(183,28,28,0.15)","#ef9a9a","rgba(183,28,28,0.5)"],
+  "Neoklasicismus":["rgba(74,20,140,0.15)","#ce93d8","rgba(74,20,140,0.5)"],
+  "Moderna & politika":["rgba(62,39,35,0.4)","#a1887f","rgba(109,76,65,0.6)"],
+  "Po 2. světové válce":["rgba(33,33,33,0.3)","#eeeeee","rgba(66,66,66,0.6)"],
+  "Janáček":["rgba(27,94,32,0.15)","#a5d6a7","rgba(27,94,32,0.5)"],
+  "Osvobozené divadlo":["rgba(136,14,79,0.15)","#f48fb1","rgba(136,14,79,0.5)"],
+};
+
+function catStyle(cat){const c=CAT_COLORS[cat]||["rgba(201,168,76,0.12)","#e8c97a","rgba(201,168,76,0.5)"];return`background:${c[0]};color:${c[1]};border-color:${c[2]}`;}
+
+const ALL_Q=[
+{cat:"Pravěk & Antika",q:"Kde bylo nalezeno naleziště hudebního luku z pravěku?",opts:["Věstonice","Řím","Babylon","Athény"],ans:0,mn:"🏺 <strong>VĚSTOnice</strong> — Věstonice = věst = vědomý nález."},
+{cat:"Pravěk & Antika",q:"Jak se jmenuje nejstarší dochovaná píseň (vytesaná na sloupu)?",opts:["Seikilova píseň","Delfský hymnus","Apollónova óda","Chámův chorál"],ans:0,mn:"🪨 <strong>SEIKILOVA</strong> — vytesána na sloupu, jako by ji někdo ZAPEČETIL (seal) do kamene."},
+{cat:"Pravěk & Antika",q:"Co je cheironomie?",opts:["Znakový systém dirigování rukama (Egypt)","Řecká notace pomocí písmen","Způsob hry na lyru","Typ chorálního zpěvu"],ans:0,mn:"✋ <strong>CHEIRO</strong> = ruka (řecky, viz chirurgie). Dirigování rukama = cheironomie."},
+{cat:"Pravěk & Antika",q:"Apollónský kult = jaké umění a jaký nástroj?",opts:["Vážné umění, lyra (kythara)","Zábavné umění, aulos","Vojenské pochody, trubka","Náboženský zpěv, varhany"],ans:0,mn:"🏛️ <strong>Apollo = lyra = vážné.</strong> Dionýsos = aulos = zábava a pití."},
+{cat:"Středověk",q:"Kdo provedl první velkou reformu gregoriánského chorálu (590–604)?",opts:["Papež Řehoř Veliký","Karel Veliký","Guido z Arezza","Philippe de Vitry"],ans:0,mn:"📜 <strong>ŘEHOŘ = GREGory = GREGoriánský</strong> — jméno dalo jméno celému stylu."},
+{cat:"Středověk",q:"Kdo vynalezl notovou osnovu a základy notace?",opts:["Guido z Arezza","Franko Kolínský","Perotinus","Guillaume de Machaut"],ans:0,mn:"🎼 <strong>Guido z Arezza</strong> — zapamatuj jako 'GUI-do' = GUI = graphical user interface = notová osnova jako rozhraní."},
+{cat:"Středověk",q:"Co je Dies Irae a kde se používá?",opts:["Sekvence, součást Requiem","Hymnus v ranních modlitbách","Typ antifony pro Vánoce","Název chorálního modu"],ans:0,mn:"☠️ <strong>Dies Irae = Boží hněv</strong>, součást Requiem. Zemřeš → Bůh zuří."},
+{cat:"Středověk",q:"Notredamská škola – kdo dovedl organum k dokonalosti a kdo ho přepracoval do 4hlasu?",opts:["Leoninus (2hlas) → Perotinus (4hlas)","Perotinus (2hlas) → Leoninus (4hlas)","Machaut → Vitry","Franko → Garlandia"],ans:0,mn:"🏗️ <strong>LEOninus = 2 hlasy, PEROtinus = 4 hlasy.</strong> PERO má 4 hroty."},
+{cat:"Středověk",q:"Guillaume de Machaut – co napsal jako první v historii?",opts:["1. kompletní vícehlasou mši (Notredamská mše)","1. requiem","1. symfonii","1. operní árii"],ans:0,mn:"⛪ <strong>MACHAUT = MA CHATA v Notre Dame</strong> → napsal 1. kompletní vícehlasou mši."},
+{cat:"Středověk",q:"Ockeghem – čím je slavný (2 věci)?",opts:["Napsal 1. requiem + 36hlasý kánon","Napsal 1. operu + Dies Irae","Reformoval chorál + vynalezl organum","Napsal Carmina Burana + moteto"],ans:0,mn:"🎪 <strong>OCKEGHEM = OKTOPUS</strong> — 36 chapadel = 36hlasý kánon + psal 1. requiem."},
+{cat:"Renesance",q:"Josquin Despréz – jeho nejslavnější mše a technika?",opts:["Missa Pange Lingua – párová imitace","Missa Papae Marcelli – cappella styl","Missa L'homme armé – monotematismus","Missa Prolationum – 36 hlasů"],ans:0,mn:"🌿 <strong>JOSQUIN = jeskyně, LINGUA = jazyk</strong> — mše s jazykem v jeskyni."},
+{cat:"Renesance",q:"Palestrina – jeho nejslavnější mše a co je na ní zvláštní?",opts:["Missa Papae Marcelli – 6hlasá, věnovaná papeži (Tridentský koncil)","Missa Pange Lingua – věnovaná Ockehemovi","Missa L'homme armé – parodická","Missa Pro Defunctis – první requiem"],ans:0,mn:"🏛️ <strong>PALESTRINA → PAPAE</strong> — Palestrina psal pro papeže (papae = papež latinsky)."},
+{cat:"Renesance",q:"Gesualdo – čím je proslulý (hudebně i osobně)?",opts:["Chromatický madrigal + zabil manželku a jejího milence","Parodická mše + slepý varhaník","Dvojsborová technika + bílinský zlosyn","Les préludes + syfilis"],ans:0,mn:"🔪 <strong>Gesualdo = chromatika + zabil manželku.</strong> Chromatik-vrah."},
+{cat:"Renesance",q:"Orlando di Lasso – kde celý život pracoval?",opts:["Mnichov – u vévody Albrechta V.","Řím – v Sixtinské kapli","Benátky – u sv. Marka","Paříž – u francouzského krále"],ans:0,mn:"🍺 <strong>LASSO = MNICHOV</strong> — Oktoberfest + laso = Bayern."},
+{cat:"Renesance",q:"Monteverdi – co je L'Orfeo a kdy proběhla premiéra?",opts:["Jedna z prvních oper, 1607 Mantova","První symfonie, 1607 Florencie","Typ madrigalu, 1607 Benátky","Oratorium, 1607 Řím"],ans:0,mn:"🎭 <strong>L'Orfeo = 1607 Mantova.</strong> Mantova má 7 písmen → 1607."},
+{cat:"Baroko",q:"Co je Basso continuo a co je pro baroko?",opts:["Nepřerušovaný akordický doprovod (cembalo+cello), základ barokní hudby","Typ fugy kde bas vede melodii","Název barokní předehry","Způsob notace bez klíče"],ans:0,mn:"🎹 <strong>Basso continuo = motor baroka.</strong> Vždy běží na pozadí jako auto motor."},
+{cat:"Baroko",q:"Händel – jak skončily jeho tři operní společnosti?",opts:["Všechny tři zkrachovaly","Dvě zkrachovaly, třetí přežila","Všechny tři prosperovaly","Prodal je a přestěhoval se"],ans:0,mn:"💸 <strong>Händel = 3× bankrot</strong> → pak se vzdal opery a psal jen oratoria."},
+{cat:"Baroko",q:"Vivaldi – kde učil a jakou má přezdívku?",opts:["Ospedale della Pietà (sirotčinec) – Rudý kněz","Sixtinská kaple – Boží houslista","Sv. Marek Benátky – Lagúnový maestro","Mannheim – Il Prete"],ans:0,mn:"🎻 <strong>Vivaldi = Rudý kněz</strong> (zrzavý). Učil v sirotčinci Ospedale della Pietà."},
+{cat:"Baroko",q:"Bach – kde strávil nejdůležitější část kariéry a jaký kostel?",opts:["Lipsko – kostel sv. Tomáše (Thomaskirche)","Výmar – zámecká kaple","Hamburk – hlavní katedrála","Drážďany – dvorní kaple"],ans:0,mn:"☕ <strong>Bach v Lipsku, kostel sv. Tomáše.</strong> Napsal Kávovou kantátu — Lipsko + káva."},
+{cat:"Baroko",q:"Händelovo Hallelujah – co se při něm tradičně dělá?",opts:["Obecenstvo vstane","Obecenstvo aplauduje vsedě","Zhasnou světla","Dirigent odchází z pódia"],ans:0,mn:"👑 <strong>Hallelujah = vstávej.</strong> Král George II. vstal → tradice dodnes."},
+{cat:"Baroko",q:"Vivaldi – komu věnoval sbírku s Čtvero ročními dobami?",opts:["Hraběti Václavu Morzinovi (Čech!)","Papeži Klementu XI.","Markraběti Braniborskému","Dóžeti benátskému"],ans:0,mn:"🇨🇿 <strong>Čtvero ročních dob věnoval Čechovi</strong> — hrabě Morzin z Čech."},
+{cat:"Klasicismus",q:"Gluckova operní reforma – které hlavní pravidlo PŘIDAL?",opts:["Předehra hudebně souvisí s operou; sbor jako dramatická postava; žádné koloratury","Kastráti zpívají všechny hlavní role","Opera musí mít 5 dějství a balet","Recitativ secco je povinný"],ans:0,mn:"⚒️ <strong>Gluck opravil 3 věci: předehra, sbor, koloratury.</strong> Přirozenost nad virtuozitou."},
+{cat:"Klasicismus",q:"Mozart – Don Giovanni – kde byla premiéra?",opts:["Praha – Stavovské divadlo, 1787","Vídeň – Burgtheater, 1787","Salzburg – Mozarteum, 1787","Londýn – Covent Garden, 1788"],ans:0,mn:"🇨🇿 <strong>Don Giovanni = Praha 1787, Stavovské divadlo.</strong> Vídeň ho odmítla, Praha zbožňovala."},
+{cat:"Klasicismus",q:"Haydn – jak se jmenuje 94. symfonie a proč?",opts:["S úderem kotlů (Surprise) – náhlý silný úder tympánů v tiché větě","Londýnská – napsána v Londýně","S ódou na radost – Beethoven ji cituje","Nedokončená – Haydn ji nedodělal"],ans:0,mn:"😱 <strong>94. Surprise = tichá melodie → najednou BUUM tympány.</strong> Anglicky Surprise = překvapení."},
+{cat:"Klasicismus",q:"Beethoven – 9. symfonie – co je na ní unikátní a kdo napsal text?",opts:["1. vokální symfonie; text Friedrich Schiller – Óda na radost","1. symfonie s flétnami; text Goethe","Nejkratší symfonie; text Mozart posmrtně","Napsaná zcela hluchým; text sám Beethoven"],ans:0,mn:"🎤 <strong>9. symfonie = zpívá, text Schiller.</strong> Hluchý Beethoven napsal první vokální symfonii."},
+{cat:"Klasicismus",q:"Beethoven 5. symfonie – co přibude v poslední větě?",opts:["Pikola, kontrafagot a 3 trombony (4. věta attacca)","Varhany a sbor","Sólový klavír","Harfa a marimba"],ans:0,mn:"🎺 <strong>4. věta Osudové přibývá pikola + kontrafagot + 3 trombony,</strong> nastupuje attacca (bez pauzy)."},
+{cat:"Romantismus",q:"Berlioz – Fantastická symfonie – jak se jmenuje ústřední motiv?",opts:["Idée fixe","Leitmotiv","Cantus firmus","Ostinato"],ans:0,mn:"💊 <strong>Idée fixe = obsese.</strong> Berlioz byl posedlý herečkou — její melodie se opakuje ve všech větách."},
+{cat:"Romantismus",q:"Brahms – co NIKDY nenapsal?",opts:["Symfonickou báseň (programní hudbu)","Symfonii","Německé requiem","Uherské tance"],ans:0,mn:"🚫 <strong>Brahms NIKDY nenapsal symfonickou báseň</strong> — jen absolutní hudba (symfonie bez příběhu)."},
+{cat:"Romantismus",q:"Schubert – jak se jmenuje jeho nedokončená symfonie?",opts:["7. (8.) Nedokončená h moll (premiéra až 1865!)","6. Velká C dur","4. Tragická c moll","3. Zimní Es dur"],ans:0,mn:"✂️ <strong>Schubertova Nedokončená h moll</strong> — premiéra až 1865, 37 let po skladatelově smrti."},
+{cat:"Romantismus",q:"Wagner – co je Gesamtkunstwerk?",opts:["Celkové umělecké dílo – vše rovnocenné (libreto, zpěv, orchestr, leitmotivy)","Typ ouvertury kde orchestr hraje celou operu","Systém 12tónových řad","Sbírka všech Wagnerových oper"],ans:0,mn:"🧩 <strong>Gesamtkunstwerk = celkové umělecké dílo</strong> — libreto + zpěv + orchestr + leitmotivy = vše rovnocenné."},
+{cat:"Romantismus",q:"Verdi – co skandálního provázelo sbor Va pensiero z Nabucca?",opts:["Stal se vlasteneckou písní; 'Viva VERDI' = Vittorio Emanuele Re D'Italia","Byl zakázán jako rouhání","Verdi ho okopíroval od Donizettiho","Nezněl nikdy živě"],ans:0,mn:"🇮🇹 <strong>Viva VERDI = Vittorio Emanuele Re D'Italia</strong> — zkratka jména krále jako revoluční heslo."},
+{cat:"Opera 19. st.",q:"Bellini – Norma – jak zní nejslavnější ária?",opts:["Casta diva – Norma se modlí k Měsíci (mateřství vs. povinnost)","O mio babbino caro","Nessun dorma","La vendetta"],ans:0,mn:"🌙 <strong>Casta diva = čistá bohyně (Měsíc).</strong> Norma = kněžka která nesmí milovat."},
+{cat:"Opera 19. st.",q:"Donizetti – Dcera pluku – proč je tato ária slavná?",opts:["Tenor zpívá 9× vysoké C = rekord; Pavarotti díky ní proslul","Sopranistka zpívá 15 minut bez dechu","Je v čínštině jako jediná italská ária","Zazněla na otevření ND"],ans:0,mn:"🎤 <strong>Dcera pluku = 9× vysoké C</strong> — Pavarotti to zpopularizoval."},
+{cat:"Opera 19. st.",q:"Puccini – Madame Butterfly – kde se odehrává a jaká stupnice to evokuje?",opts:["Japonsko – pentatonika","Čína – celotónová stupnice","Indie – modální stupnice","Egypt – chromatická"],ans:0,mn:"🗾 <strong>Butterfly = Japonsko = pentatonika</strong> (5 tónů, jako pětiramenná hvězda)."},
+{cat:"Opera 19. st.",q:"Carmen – kdo ji složil a v které zemi se odehrává (a NIKDY tam nebyl)?",opts:["Bizet – Španělsko (Bizet tam nikdy nebyl!)","Rossini – Itálie","Offenbach – Francie","Massenet – Maroko"],ans:0,mn:"🌹 <strong>Bizet napsal Carmen o Španělsku, aniž tam kdy byl.</strong>"},
+{cat:"Čechy & Smetana",q:"Smetana – 'Má vlast' – kolik symfonických básní má a jaké jsou první dvě?",opts:["6 básní – Vyšehrad + Vltava","4 básně – Šárka + Blaník","8 básní – Libuše + Praha","6 básní – Vltava + Tábor"],ans:0,mn:"🏰 <strong>Má vlast = 6 básní.</strong> Pořadí: Vyšehrad, Vltava, Šárka, Háje, Tábor, Blaník."},
+{cat:"Čechy & Smetana",q:"Smetana – kterou operou se otevřelo Národní divadlo v roce 1881?",opts:["Libuše","Prodaná nevěsta","Dalibor","Braniboři v Čechách"],ans:0,mn:"👸 <strong>Libuše otevírala ND 1881</strong> — česká věštkyně otevřela českou chrám hudby."},
+{cat:"Čechy & Smetana",q:"Kde domov můj – kdo složil hudbu a při jaké příležitosti zazněla poprvé?",opts:["František Škroup – Fidlovačka (1834)","Bedřich Smetana – Má vlast","Karel Kovařovic – Národní divadlo","Antonín Dvořák – Slovanské tance"],ans:0,mn:"🏠 <strong>Škroup, Fidlovačka 1834</strong> = ševcovský svátek. Hymna vznikla na ševcovském pikniku."},
+{cat:"Čechy & Dvořák",q:"Dvořák – 9. symfonie – kde vznikla a při které historické události hrála?",opts:["Amerika – hrála při 1. přistání na Měsíc","Amerika – hrála při pádu Berlínské zdi","Anglie – korunovace Karla III.","Praha – sametová revoluce"],ans:0,mn:"🚀 <strong>Novosvětská hrála při přistání na Měsíci.</strong> Amerika → nový svět → Měsíc."},
+{cat:"Čechy & Dvořák",q:"Dvořák – Slovanské tance – kdo si je objednal a od koho jsou Uherské tance?",opts:["Nakladatel Simrock objednal Slovanské – Uherské jsou od Brahmse!","Smetana objednal – Brahms napsal Slovanské","Liszt – inspiroval ho k nim","Čajkovský – výměna folklorních inspirací"],ans:0,mn:"🎻 <strong>Dvořák = Slovanské tance (Simrock), Brahms = Uherské.</strong> Nikdy nezaměňuj!"},
+{cat:"Národní školy",q:"Glinka – Ruslan a Ludmila – jaký tanec se tu poprvé objevuje?",opts:["Lezginka – kavkazský 9-ti doby tanec","Gopak – kozácký tanec","Mazurka – polský tanec","Csárdás – maďarský tanec"],ans:0,mn:"💃 <strong>Lezginka = kavkazský tanec, 9-ti doby.</strong> Poprvé v Ruslanu a Ludmile."},
+{cat:"Národní školy",q:"Mocná hrstka – kdo ji tvořil (stačí 3 jména)?",opts:["Balakirev, Musorgskij, Rimskij-Korsakov (+ Borodin, Kjuj)","Glinka, Čajkovskij, Rachmaninov","Skrjabin, Rubinstein, Prokofjev","Šostakovič, Prokofjev, Chačaturjan"],ans:0,mn:"✊ <strong>Mocná hrstka = 5 samouků:</strong> Balakirev, Borodin, Kjuj, Musorgskij, Rimskij-Korsakov."},
+{cat:"Národní školy",q:"Sibelius – Finlandia – proč byla zakázána?",opts:["Ruská vláda ji zakázala jako finský vlastenecký symbol","Byla příliš hlučná","Obsahovala zakázané tóniny","Věnoval ji protivníkovi cara"],ans:0,mn:"🇫🇮 <strong>Finlandia zakázána Rusy</strong> jako finský vlastenecký symbol."},
+{cat:"Přelom 19./20. st.",q:"Mahler – 7. symfonie – kde měla světovou premiéru?",opts:["Praha!","Vídeň","New York MET","Mnichov"],ans:0,mn:"🇨🇿 <strong>Mahler 7. = světová premiéra Praha.</strong> Mahler byl v Praze kapelník."},
+{cat:"Přelom 19./20. st.",q:"Mahler – 5. symfonie – proč je Adagietto slavné?",opts:["Je to milostný dopis Almě (použito ve Viscontiho filmu Smrt v Benátkách)","Smuteční tóny pro zemřelou dceru","Nejdelší single věta v historii","Hraje se při olympiádě"],ans:0,mn:"💌 <strong>Adagietto = milostný dopis Almě</strong>, použito ve Viscontiho Smrti v Benátkách."},
+{cat:"Přelom 19./20. st.",q:"Skrjabin – Prometheus – co unikátního chtěl při premiéře?",opts:["Světelný klavír – synesteze (tóny = barvy, premiéra 1915)","Vystoupení v úplné tmě","300 hráčů najednou","Premiéra pod vodou"],ans:0,mn:"🌈 <strong>Skrjabin = synesteze</strong> (tóny = barvy). Pro Promethea vymyslel světelný klavír."},
+{cat:"Impresionismus",q:"Debussy – Faunovo odpoledne – proč je historicky zlomové?",opts:["Označováno za 'začátek nové hudební éry' (Boulez); premiéra 22.12.1894","Poprvé hrál cembalo sólově","Používá poprvé 12tónovou řadu","1. opera kde ženy zpívají"],ans:0,mn:"🧚 <strong>Faunovo odpoledne 1894</strong> — Boulez: 'Tady začala moderní hudba.'"},
+{cat:"Impresionismus",q:"Ravel – Bolero – v čem spočívá jeho princip?",opts:["Ostinátní rytmus se OPAKUJE celou dobu, mění se jen nástroje a dynamika","Variace na španělské lidové písně","30 různých témat za sebou","Je psáno ve 3/4 taktu jako valčík"],ans:0,mn:"🥁 <strong>Bolero = jeden rytmus celou dobu</strong>, mění se jen nástroje a dynamika."},
+{cat:"Impresionismus",q:"Dukas – Čarodějův učeň – kde je díky tomuto dílu nejznámější?",opts:["V Disney filmu Fantasia (myšák Mickey)","V reklamě na BMW","V úvodní znělce olympijských her","V české hymně jako citace"],ans:0,mn:"🐭 <strong>Čarodějův učeň = Mickey Mouse s metlou</strong>, Disney Fantasia 1940."},
+{cat:"2. vídeňská škola",q:"Dodekafonie – kdo ji vynalezl a kdy?",opts:["Arnold Schönberg – 1923 (první dodekafonní skladba)","Anton Webern – 1908","Alban Berg – 1925","Igor Stravinskij – 1913"],ans:0,mn:"🔢 <strong>Dodekafonie = Schönberg 1923.</strong> Dode = 12 (řecky)."},
+{cat:"2. vídeňská škola",q:"Berg – Vojcek – kde mělo skandální premiéru a kdo ho uvedl v Praze?",opts:["Berlín skandál → Ostrčil ho uvedl v Praze","Vídeň úspěch → Weber v Berlíně","Řím → Toscanini v New Yorku","Paříž → Debussy v Londýně"],ans:0,mn:"🔪 <strong>Vojcek = Berlin skandál → Ostrčil ho uvedl v Praze.</strong>"},
+{cat:"2. vídeňská škola",q:"Webern – čím ovlivnil poválečnou avantgardu?",opts:["Punktualismem – rozptýlení tónů + Klangfarbenmelodie","Byl ředitelem darmstadtských kurzů","Vynalezl minimalismus","Napsal první elektronickou skladbu"],ans:0,mn:"🔬 <strong>Webern = atom hudby.</strong> 30 děl, obrovský vliv. Zabit omylem 4 měsíce po válce."},
+{cat:"Neoklasicismus",q:"Stravinskij – Svěcení jara – proč způsobilo skandál (Paříž 1913)?",opts:["Bitonální harmonie + divoký tanec + pohanské rituály","Příliš tichá hudba","Bez orchestru – jen bicí","Debussy ho osobně vybucat"],ans:0,mn:"🌱 <strong>Svěcení jara 1913 Paříž = největší skandál v dějinách hudby.</strong>"},
+{cat:"Neoklasicismus",q:"Pařížská šestka – kdo byl jejich 'otec' a inspirátor?",opts:["Erik Satie","Claude Debussy","Ravel","César Franck"],ans:0,mn:"🎩 <strong>Satie = táta Pařížské šestky.</strong> Řekl: 'Hudba má být tapeta — nevšímej si jí.'"},
+{cat:"Neoklasicismus",q:"Carl Orff – Carmina Burana – odkud pochází texty?",opts:["Středověký rukopis (13. st.) – vagantské písně","Bible – Starý zákon","Homérova Ilias","Brechovy básně"],ans:0,mn:"🍺 <strong>Carmina Burana = středověký rukopis, vagantské písně</strong> (pití, láska, hazard)."},
+{cat:"Moderna & politika",q:"Šostakovič 7. symfonie – proč je historicky důležitá?",opts:["Leningradská (1941) – napsána během obléhání, symbol odporu","Sovětská – oslava Stalina","Válečná – zakázána jako protinaciská","Vítězná – premiéra den po vítězství"],ans:0,mn:"🏙️ <strong>Leningradská = psána přímo za bombardování obléhaného Leningradu.</strong>"},
+{cat:"Moderna & politika",q:"Terezín – jaká dětská opera tam byla provedena 55×?",opts:["Brundibár (Hans Krása)","Prodaná nevěsta (Smetana)","Matka (Hába)","Čarostřelec (Weber)"],ans:0,mn:"🐝 <strong>Brundibár = čmelák, Hans Krása, 55× v Terezíně.</strong>"},
+{cat:"Moderna & politika",q:"Prokofjev a Stalin – co se stalo 5. března 1953?",opts:["Oba zemřeli ve stejný den – Prokofjev ignorován (Stalin měl všechny kytky)","Prokofjev dostal Stalinovu cenu, Stalin zemřel","Stalin zakázal Prokofjeva, ten uprchl","Oba premiérovali operu"],ans:0,mn:"⚰️ <strong>5.3.1953 — Stalin i Prokofjev stejný den.</strong> Stalin = všechny kytky. Prokofjev = 30 lidí, žádné."},
+{cat:"Po 2. světové válce",q:"John Cage – 4'33'' – co se děje při provádění?",opts:["Interpret nic nehraje – smyslem je naslouchat okolním zvukům; 273 sekund = absolutní nula","Hraje 4 minuty a 33 vteřin naplno","Hrají 4 lidi po 33 vteřinách","4 hlasy a 33 taktů"],ans:0,mn:"🤫 <strong>4'33'' = ticho.</strong> 273 sekund = absolutní nula. Slyšíš zvuky sálu místo hudby."},
+{cat:"Po 2. světové válce",q:"Minimalismus – kdo je zakladatel a jaký je princip?",opts:["Steve Reich – opakování modelu s minimálními změnami = meditace","John Cage – náhoda a ticho","Boulez – serialismus = řady","Glass – opera bez melodie"],ans:0,mn:"🔁 <strong>Steve Reich = minimalismus = opakování s minimálními změnami.</strong>"},
+{cat:"Janáček",q:"Janáček – co jsou 'nápěvky mluvy' a od kdy je sbíral?",opts:["Záznamy přirozené intonace řeči převáděné do not; od 1897 (4000 zápisků)","Lidové písně přepsané do moderní notace","Způsob dirigování bez taktovky","Systém improvizace"],ans:0,mn:"🎙️ <strong>Janáček zapisoval tóny lidské řeči od 1897</strong> — 4000 zápisků, základ jeho stylu."},
+{cat:"Janáček",q:"Janáček – Její pastorkyňa (Jenůfa) – kdy proběhl pražský průlom?",opts:["1916 Praha (průlom) – předtím 12 let odmítáno Národním divadlem","1904 Brno = okamžitý světový úspěch","1916 Vídeň = první uvedení vůbec","1920 Praha = běžná premiéra"],ans:0,mn:"💔 <strong>Jenůfa odmítána ND 12 let → 1916 Praha = průlom.</strong>"},
+{cat:"Janáček",q:"Janáček – Glagolská mše – v jakém jazyce je text?",opts:["Staroslověnština (glagolice = nejstarší slovanské písmo)","Latina","Čeština","Srbochorvatština"],ans:0,mn:"🔡 <strong>Glagolská mše = staroslověnština</strong> (glagolice = nejstarší slovanské písmo, Cyril a Metoděj)."},
+{cat:"Osvobozené divadlo",q:"V+W+J – kdo byl J a co se mu stalo?",opts:["Jaroslav Ježek – skladatel, zemřel 1942 v USA","Josef Jiráček – herec, zemřel v Terezíně","Jan Jičínský – libretista, přežil válku","Jiří Johánek – dirigent, emigroval"],ans:0,mn:"🎹 <strong>J = Ježek = hudba V+W.</strong> Zemřel 1942 v New Yorku. Hit: Bugatti step."},
+{cat:"Osvobozené divadlo",q:"E. F. Burian – co vynalezl?",opts:["Voiceband (sborová recitace) + theatregraph (film + jevišní akce)","Mikrofon pro divadlo","Systém promptérky","Rotující jeviště"],ans:0,mn:"🎭 <strong>Burian = voiceband (sbor recituje) + theatregraph (film + jeviště).</strong>"},
+];
+
+let mode='quiz', activeCategories=new Set([...new Set(ALL_Q.map(q=>q.cat))]);
+let deck=[], idx=0, answered=false, okCount=0, badCount=0, streak=0;
+
+function getCategories(){return[...new Set(ALL_Q.map(q=>q.cat))];}
+
+function buildFilterRow(){
+  const cats=getCategories();
+  const row=document.getElementById('filter-row');
+  row.innerHTML='';
+  cats.forEach(c=>{
+    const chip=document.createElement('button');
+    chip.className='chip'+(activeCategories.has(c)?' on':'');
+    chip.textContent=c;
+    chip.onclick=()=>{
+      if(activeCategories.has(c)){if(activeCategories.size>1)activeCategories.delete(c);}
+      else activeCategories.add(c);
+      buildFilterRow();startSession();
+    };
+    row.appendChild(chip);
+  });
+}
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+function startSession(){
+  const filtered=ALL_Q.filter(q=>activeCategories.has(q.cat));
+  deck=shuffle([...filtered]);
+  idx=0;answered=false;
+  updateProgress();render();
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===(m==='quiz'?0:1)));
+  startSession();
+}
+
+function updateStats(){
+  document.getElementById('h-ok').textContent=okCount;
+  document.getElementById('h-bad').textContent=badCount;
+  document.getElementById('h-streak').textContent=streak;
+}
+
+function updateProgress(){
+  const pct=Math.round((idx/Math.max(deck.length,1))*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`Otázka ${Math.min(idx+1,deck.length)} / ${deck.length}`;
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+
+function render(){
+  updateProgress();
+  if(idx>=deck.length){showScore();return;}
+  const q=deck[idx];
+  if(mode==='quiz')renderQuiz(q);
+  else renderFlash(q);
+}
+
+function renderQuiz(q){
+  const sty=catStyle(q.cat);
+  const opts=q.opts.map((o,i)=>`<button class="opt" onclick="choose(${i})"><span class="letter">${String.fromCharCode(65+i)}</span>${o}</button>`).join('');
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="q-card">
+      <div class="cat-badge" style="${sty}">${q.cat}</div>
+      <div class="q-num">Otázka ${idx+1} z ${deck.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div id="feedback"></div>
+    </div>`;
+}
+
+function renderFlash(q){
+  const sty=catStyle(q.cat);
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="q-card">
+      <div class="cat-badge" style="${sty}">${q.cat}</div>
+      <div class="q-num">Otázka ${idx+1} z ${deck.length}</div>
+      <div class="flash-q">${q.q}</div>
+      <button class="show-answer-btn" onclick="revealFlash()" id="show-btn">👁 Zobrazit odpověď</button>
+      <div class="flash-ans" id="flash-ans">
+        <div class="flash-ans-text">✅ ${q.opts[q.ans]}</div>
+        ${q.mn?`<div class="mnemonic">💡 <strong>Zapamatuj si:</strong><br>${q.mn}</div>`:''}
+      </div>
+      <div class="flash-btns" id="flash-btns" style="display:none">
+        <button class="flash-btn good" onclick="flashGood()">👍 Uměl jsem</button>
+        <button class="flash-btn bad" onclick="flashBad()">👎 Nevěděl jsem</button>
+      </div>
+    </div>`;
+}
+
+function revealFlash(){
+  document.getElementById('flash-ans').style.display='block';
+  document.getElementById('flash-btns').style.display='flex';
+  document.getElementById('show-btn').style.display='none';
+}
+
+function flashGood(){okCount++;streak++;updateStats();idx++;render();}
+function flashBad(){badCount++;streak=0;updateStats();idx++;render();}
+
+function choose(i){
+  if(answered)return;
+  answered=true;
+  const q=deck[idx];
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach(o=>o.disabled=true);
+  const isOk=(i===q.ans);
+  opts[i].classList.add(isOk?'correct':'wrong');
+  if(!isOk)opts[q.ans].classList.add('reveal');
+  if(isOk){okCount++;streak++;}else{badCount++;streak=0;}
+  updateStats();
+  const fb=document.getElementById('feedback');
+  const msgs_ok=["Výborně! 🎵","Správně! Jsi borec!","Přesně tak! 🎶","Jo, to je ono! ✅","Parádní!"];
+  const msgs_bad=["Ouha! Ale nevadí 💪","Ne tak rychle 😅","Takhle ne, takhle ano!","Příště to bude!","Zapamatuj si!"];
+  const msg=isOk?msgs_ok[Math.floor(Math.random()*msgs_ok.length)]:msgs_bad[Math.floor(Math.random()*msgs_bad.length)];
+  fb.innerHTML=`<div class="feedback ${isOk?'ok':'nok'}">
+    <div class="fb-correct">${msg}${!isOk?` &nbsp;|&nbsp; Správně: <strong>${q.opts[q.ans]}</strong>`:''}</div>
+    ${q.mn?`<div class="mnemonic">💡 <strong>Zapamatuj si:</strong><br>${q.mn}</div>`:''}
+  </div>
+  <button class="btn-next" onclick="nextQ()">Další otázka →</button>`;
+}
+
+function nextQ(){idx++;answered=false;render();}
+
+function showScore(){
+  const total=okCount+badCount;
+  const pct=total?Math.round((okCount/total)*100):0;
+  const [emoji,msg]= pct>=90?['🏆','Mistr! Jsi historik hudby!']:
+    pct>=70?['🎵','Skvělé! Maturita tě nezastaví!']:
+    pct>=50?['👏','Dobrý základ, ještě trochu trénovat!']:
+    ['💪','Nevzdávej to! Opakování je matka moudrosti!'];
+  document.getElementById('quiz-area').innerHTML=`
+    <div class="q-card score-screen">
+      <div class="score-emoji">${emoji}</div>
+      <div class="score-pct">${pct}%</div>
+      <div class="score-msg">${msg}</div>
+      <div class="score-stats">
+        <div class="score-stat"><b>${okCount}</b>správně</div>
+        <div class="score-stat"><b>${badCount}</b>špatně</div>
+        <div class="score-stat"><b>${streak}</b>série</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;padding:14px" onclick="okCount=0;badCount=0;streak=0;updateStats();startSession()">🔄 Znovu od začátku</button>
+    </div>`;
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('prog-pct').textContent='100%';
+}
+
+buildFilterRow();
+</script>
+</body>
+</html>
