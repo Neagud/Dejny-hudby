@@ -801,7 +801,12 @@ function render(){
 
 function renderQuiz(q){
   const sty=catStyle(q.cat);
-  const opts=q.opts.map((o,i)=>`<button class="opt" onclick="choose(${i})"><span class="letter">${String.fromCharCode(65+i)}</span>${o}</button>`).join('');
+  // Shuffle options while tracking the correct answer
+  const indices=[0,1,2,3];
+  for(let i=indices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[indices[i],indices[j]]=[indices[j],indices[i]];}
+  const shuffledOpts=indices.map(i=>q.opts[i]);
+  const newAns=indices.indexOf(q.ans);
+  const opts=shuffledOpts.map((o,i)=>`<button class="opt" onclick="choose(${i},${newAns})"><span class="letter">${String.fromCharCode(65+i)}</span>${o}</button>`).join('');
   document.getElementById('quiz-area').innerHTML=`
     <div class="q-card">
       <div class="cat-badge" style="${sty}">${q.cat}</div>
@@ -840,15 +845,15 @@ function revealFlash(){
 function flashGood(){okCount++;streak++;updateStats();idx++;render();}
 function flashBad(){badCount++;streak=0;updateStats();idx++;render();}
 
-function choose(i){
+function choose(i,correctIdx){
   if(answered)return;
   answered=true;
   const q=deck[idx];
   const opts=document.querySelectorAll('.opt');
   opts.forEach(o=>o.disabled=true);
-  const isOk=(i===q.ans);
+  const isOk=(i===correctIdx);
   opts[i].classList.add(isOk?'correct':'wrong');
-  if(!isOk)opts[q.ans].classList.add('reveal');
+  if(!isOk)opts[correctIdx].classList.add('reveal');
   if(isOk){okCount++;streak++;}else{badCount++;streak=0;}
   updateStats();
   const fb=document.getElementById('feedback');
